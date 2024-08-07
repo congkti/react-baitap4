@@ -1,0 +1,18 @@
+// fix style table
+
+table {
+  border: 1px solid #1f2937 !important;
+  border-radius: 10px !important;
+}
+table thead.ant-table-thead tr th,
+table thead.ant-table-thead tr td {
+  background-color: #1f2937 !important;
+  color: white !important;
+}
+
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px !important;
+}
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px !important;
+}
