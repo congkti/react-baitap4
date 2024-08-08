@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import InputCustom from "./InputCustom";
 import TableSinhVien from "./TableSinhVien";
 import { useFormik } from "formik";
@@ -16,7 +16,7 @@ const ThongTinSinhVien = () => {
 
   // 2. Tạo State để quản lý mảng sinh viên. Gọi formik để submit form -> hiển thị dữ liệu mảng lên giao diện table
   const [arrSinhVien, setArrSinhVien] = useState([]);
-  const [filterArrSinhVien, setFilterArrSinhVien] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   // 1. Xây dựng form dùng Formik
   const {
@@ -38,6 +38,21 @@ const ThongTinSinhVien = () => {
       dienThoai: "",
       email: "",
     },
+    onSubmit: (values, { resetForm }) => {
+      // copy mảng mới > truyền thuộc tính của object từ formik vào trước khi setState để đảm bảo giữ đúng cấu trúc mảng của arrSinhVien
+      // Kiểm tra nếu tất cả các trường trong values đều rỗng
+      // console.log(isValid);
+      // if (isValid && dirty) {
+      //   console.log("submit false");
+      //   return;
+      // }
+
+      console.log("submit true");
+      console.log(values);
+      setArrSinhVien([...arrSinhVien, values]);
+      saveLocalStorage("arrSinhVien", [...arrSinhVien, values]);
+      resetForm();
+    },
     // 5. xử lý validate form bằng yup
     validationSchema: yup.object({
       mssv: yup
@@ -58,20 +73,12 @@ const ThongTinSinhVien = () => {
         ),
       email: yup.string().email(notiFor.email).required(notiFor.empty),
     }),
-    onSubmit: (values, { resetForm }) => {
-      // copy mảng mới > truyền thuộc tính của object từ formik vào trước khi setState để đảm bảo giữ đúng cấu trúc mảng của arrSinhVien
-      console.log(!values);
-      setArrSinhVien([...arrSinhVien, values]);
-      saveLocalStorage("arrSinhVien", [...arrSinhVien, values]);
-      resetForm();
-    },
   });
 
   // 4. Tạo useEffect để chạy lấy dữ liệu từ localStorage -> update state
   useEffect(() => {
     const dataLocal = getValueLocalStorage("arrSinhVien");
     dataLocal && setArrSinhVien(dataLocal);
-    dataLocal && setFilterArrSinhVien(dataLocal);
   }, []);
 
   // 5. Xóa sinhVien
@@ -81,7 +88,6 @@ const ThongTinSinhVien = () => {
     if (index != -1) {
       newArrSinhVien.splice(index, 1);
       setArrSinhVien(newArrSinhVien);
-      setFilterArrSinhVien(newArrSinhVien);
       saveLocalStorage("arrSinhVien", newArrSinhVien);
     }
   };
@@ -108,31 +114,41 @@ const ThongTinSinhVien = () => {
     if (index != -1) {
       newArrSinhVien[index] = values; // values = lấy dữ liệu đã sửa từ form
       setArrSinhVien(newArrSinhVien);
-      setFilterArrSinhVien(newArrSinhVien);
       saveLocalStorage("arrSinhVien", newArrSinhVien);
+      resetForm();
     }
     console.log(newArrSinhVien);
   };
 
   // 7. Search nhân viên theo tên
   const handleSearch = (event) => {
-    let keyword = removeVietnameseTones(
-      event.target.value.toLowerCase().trim()
-    );
-    let arrSinhVienFilter = arrSinhVien.filter((item, index) => {
+    setSearchKeyword(event.target.value);
+  };
+
+  // dùng useMemo thay đổi để ghi nhớ filter sinhVien khi arrSinhVien/keywword thay đổi
+  const filteredSinhVien = useMemo(() => {
+    let keyword = removeVietnameseTones(searchKeyword.toLowerCase().trim());
+    return arrSinhVien.filter((item) => {
       let matchName = removeVietnameseTones(item.hoTen.toLowerCase().trim());
       return matchName.includes(keyword);
+      // Kiểm tra item.hoTen có tồn tại và không bị undefined (nếu hoTen là undefine => bị lỗi ko gọi được .toLowerCase().trim())
+      // if (item.hoTen) {
+      //   let matchName = removeVietnameseTones(item.hoTen.toLowerCase().trim());
+      //   return matchName.includes(keyword);
+      // }
+      // return false; // Nếu item.hoTen là undefined, loại bỏ item này khỏi kết quả lọc
     });
-    console.log(arrSinhVienFilter);
-    // đưa lên giao diện
-    setFilterArrSinhVien(arrSinhVienFilter);
-  };
+  }, [arrSinhVien, searchKeyword]);
 
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-8 min-h-screen">
       <h2 className="bg-gray-800 text-white text-2xl px-5 py-2 mb-5">
         Thông tin sinh viên
       </h2>
+      <p className="text-red-500 text-xs py-3">
+        Phần validate ko chạy lần đầu được. Nhấn clear form trước mới chạy đc. .
+        Chưa tìm đc cách Fix!!
+      </p>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-5">
           <InputCustom
@@ -216,7 +232,7 @@ const ThongTinSinhVien = () => {
       <div className="mt-5">
         <TableSinhVien
           // arrSinhVien={arrSinhVien}
-          arrSinhVien={filterArrSinhVien}
+          arrSinhVien={filteredSinhVien}
           handleDeleteSinhVien={handleDeleteSinhVien}
           handleGetSinhVien={handleGetSinhVien}
         />
