@@ -16,3 +16,19 @@ table tbody tr:last-child td:first-child {
 table tbody tr:last-child td:last-child {
   border-bottom-right-radius: 10px !important;
 }
+
+button[disabled],
+button[disabled="true"] {
+  opacity: 0.5;
+  background-color: gray;
+  cursor: not-allowed;
+  &:hover {
+    background-color: gray;
+  }
+}
+
+input[disabled],
+input[disabled="true"] {
+  cursor: not-allowed;
+  background-color: #ddd;
+}

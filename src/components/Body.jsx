@@ -1,9 +1,11 @@
 import ThongTinSinhVien from "./SinhVien/ThongTinSinhVien";
+import ThongTinSinhVienChinhSua from "./SinhVien/ThongTinSinhVienChinhSua";
 
 const Body = () => {
   return (
     <>
-      <ThongTinSinhVien />
+      {/* <ThongTinSinhVien /> */}
+      <ThongTinSinhVienChinhSua />
     </>
   );
 };

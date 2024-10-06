@@ -43,10 +43,10 @@ const TableSinhVien = ({
         <Space size="middle">
           <button
             onClick={() => {
-              console.log(record);
+              // console.log(record);
               handleGetSinhVien(record);
             }}
-            className="py-2 px-5 bg-yellow-500 text-white rounded-lg"
+            className="py-2 px-5 bg-yellow-500 hover:opacity-70 text-white rounded-lg"
           >
             Sửa
           </button>
@@ -54,7 +54,7 @@ const TableSinhVien = ({
             onClick={() => {
               handleDeleteSinhVien(record.mssv);
             }}
-            className="py-2 px-5 bg-red-500 text-white rounded-lg"
+            className="py-2 px-5 bg-red-500 hover:opacity-70 text-white rounded-lg"
           >
             Xóa
           </button>

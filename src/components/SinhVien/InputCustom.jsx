@@ -12,6 +12,7 @@ const InputCustom = ({
   onBlur,
   error,
   touched,
+  disabled,
 }) => {
   return (
     <div className={classWrapper}>
@@ -26,6 +27,7 @@ const InputCustom = ({
         onChange={onChange}
         onBlur={onBlur}
         value={value}
+        disabled={disabled}
       />
       {/* error message */}
       {error && touched && <p className="text-red-500">{error}</p>}
